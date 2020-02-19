@@ -2,7 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import os
-script_dir = os.path.dirname(__file__)
+
+
+def main():
+
+    script_dir = os.path.dirname(__file__)
+    filename = 'clusters.txt'
+    path = os.path.join(script_dir, filename)
+
+    # call all three functions
+    data_array = get_data(path)
+    cluster_list, cluster_assignment = k_means(data_array, 3)
+    plot_kmeans(cluster_list)
+
 
 def get_data(path):
 
@@ -96,18 +108,15 @@ def plot_kmeans(cluster_list):
 
     colors = ['red', 'blue', 'green']
     counter = 0
+
     for cluster in cluster_list:
         x = [float(point[0]) for point in cluster]
         y = [float(point[1]) for point in cluster]
         plt.scatter(x, y, color=colors[counter])
+
         counter = counter + 1
     plt.show()
 
 
-filename = 'clusters.txt'
-path = os.path.join(script_dir, filename)
-
-#call all three functions
-data_array = get_data(path)
-cluster_list, cluster_assignment = k_means(data_array, 3)
-plot_kmeans(cluster_list)
+if __name__ == "__main__":
+    main()
