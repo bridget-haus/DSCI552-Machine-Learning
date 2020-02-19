@@ -1,19 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import os
+script_dir = os.path.dirname(__file__)
 
-with open('/Users/bridgethaus/Desktop/clusters.txt') as f:
-    lines = f.readlines()
-    # assign each x coordinate to a list
-    x = [float(line.split(',')[0]) for line in lines]
-    # assign each y coordinate to a list
-    y = [float(line.split(',')[1]) for line in lines]
+def get_data(path):
 
+    with open(path) as f:
+        lines = f.readlines()
+        # assign each x coordinate to a list
+        x = [float(line.split(',')[0]) for line in lines]
+        # assign each y coordinate to a list
+        y = [float(line.split(',')[1]) for line in lines]
 
-# create numpy array for our dataset
+    # create numpy array for our dataset
 
-data = list(zip(x,y))
-data_array = np.asarray(data, dtype=np.float32)
+    data = list(zip(x,y))
+    data_array = np.asarray(data, dtype=np.float32)
+
+    return data_array
 
 
 
@@ -44,7 +49,6 @@ def k_means(data_array, num_clusters):
 
         j = 0
         changed = False
-
         cluster_list = []
 
         for i in range(num_clusters):
@@ -86,27 +90,24 @@ def k_means(data_array, num_clusters):
     return cluster_list, cluster_assignment
 
 
-cluster_list, cluster_assignment = k_means(data_array, 3)
-
-
 # plot all of the clusters
 
-one = cluster_list[0]
-two = cluster_list[1]
-three = cluster_list[2]
+def plot_kmeans(cluster_list):
 
-x1 = [float(point[0]) for point in one]
-y1 = [float(point[1]) for point in one]
-
-x2 = [float(point[0]) for point in two]
-y2 = [float(point[1]) for point in two]
-
-x3 = [float(point[0]) for point in three]
-y3 = [float(point[1]) for point in three]
+    colors = ['red', 'blue', 'green']
+    counter = 0
+    for cluster in cluster_list:
+        x = [float(point[0]) for point in cluster]
+        y = [float(point[1]) for point in cluster]
+        plt.scatter(x, y, color=colors[counter])
+        counter = counter + 1
+    plt.show()
 
 
-plt.scatter(x1, y1, color='red')
-plt.scatter(x2, y2, color='blue')
-plt.scatter(x3, y3, color='green')
+filename = 'clusters.txt'
+path = os.path.join(script_dir, filename)
 
-plt.show()
+#call all three functions
+data_array = get_data(path)
+cluster_list, cluster_assignment = k_means(data_array, 3)
+plot_kmeans(cluster_list)
