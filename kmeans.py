@@ -10,7 +10,6 @@ def main():
     filename = 'clusters.txt'
     path = os.path.join(script_dir, filename)
 
-    # call all three functions
     data_array = get_data(path)
     cluster_list, cluster_assignment = k_means(data_array, 3)
     plot_kmeans(cluster_list)
@@ -26,36 +25,39 @@ def get_data(path):
         y = [float(line.split(',')[1]) for line in lines]
 
     # create numpy array for our dataset
-
-    data = list(zip(x,y))
+    data = list(zip(x, y))
     data_array = np.asarray(data, dtype=np.float32)
 
     return data_array
 
 
-
-def k_means(data_array, num_clusters):
+def random_cluster_center(data_array, num_clusters):
 
     # find shape of array
-
     num_rows = data_array.shape[0]
     num_columns = data_array.shape[1]
 
-    # set matrices to 0
-
-    cluster_assignment = np.zeros(num_rows, dtype=int)
-    means = np.zeros((num_clusters, num_columns))
-
-    dup_check = []
+    centers = np.zeros((num_clusters, num_columns))
 
     # generate random cluster centers
+    dup_check = []
     for i in range(num_clusters):
 
         randint = random.randint(0, num_rows - 1)
         while randint in dup_check:
             randint = random.randint(0, num_rows - 1)
         dup_check.append(randint)
-        means[i] = data_array[randint]
+        # append random centers to centers matrix
+        centers[i] = data_array[randint]
+
+    return num_rows, num_columns, centers
+
+
+def k_means(data_array, num_clusters):
+
+    num_rows, num_columns, centers = random_cluster_center(data_array, 3)
+
+    cluster_assignment = np.zeros(num_rows, dtype=int)
 
     while True:
 
@@ -67,14 +69,16 @@ def k_means(data_array, num_clusters):
             cluster_list.append([])
 
         for point in data_array:
+            # argmin is the label of the cluster
             argmin = 1
             dist_list = []
-            for mean in means:
+            for mean in centers:
                 # calculate distance between each point and each cluster mean
                 dist = np.linalg.norm(point - mean)
                 dist_list.append([dist, argmin])
                 argmin = argmin + 1
 
+            # for each point, choose cluster who's distance is smallest
             min_dist = min(dist_list)
             argmin = min_dist[1]
 
@@ -85,30 +89,29 @@ def k_means(data_array, num_clusters):
             cluster_list[argmin - 1].append(point)
             j += 1
 
-        # if no point has its cluster reassigned, we have converged
+        # reached convergence when no point is reassigned
         if not changed:
             break
 
         counter = 0
         for cluster in cluster_list:
 
-            # recalculate cluster means
+            # recalculate cluster centers
             if len(cluster) != 0:
                 sum_matrix = sum(cluster)
                 sum_matrix /= len(cluster)
-                means[counter] = sum_matrix
+                centers[counter] = sum_matrix
                 counter = counter + 1
 
     return cluster_list, cluster_assignment
 
-
-# plot all of the clusters
 
 def plot_kmeans(cluster_list):
 
     colors = ['red', 'blue', 'green']
     counter = 0
 
+    # plot all of the clusters
     for cluster in cluster_list:
         x = [float(point[0]) for point in cluster]
         y = [float(point[1]) for point in cluster]
