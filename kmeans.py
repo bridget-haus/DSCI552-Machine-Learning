@@ -11,7 +11,8 @@ def main():
     path = os.path.join(script_dir, filename)
 
     data_array = get_data(path)
-    cluster_list, cluster_assignment = k_means(data_array, 3)
+    cluster_list, cluster_assignment, centers = k_means(data_array, 3)
+    print(f'Final cluster centroids:\n{centers}')
     plot_kmeans(cluster_list)
 
 
@@ -56,7 +57,6 @@ def random_cluster_center(data_array, num_clusters):
 def k_means(data_array, num_clusters):
 
     num_rows, num_columns, centers = random_cluster_center(data_array, 3)
-
     cluster_assignment = np.zeros(num_rows, dtype=int)
 
     while True:
@@ -103,7 +103,7 @@ def k_means(data_array, num_clusters):
                 centers[counter] = sum_matrix
                 counter = counter + 1
 
-    return cluster_list, cluster_assignment
+    return cluster_list, cluster_assignment, centers
 
 
 def plot_kmeans(cluster_list):
@@ -118,6 +118,7 @@ def plot_kmeans(cluster_list):
         plt.scatter(x, y, color=colors[counter])
 
         counter = counter + 1
+
     plt.show()
 
 
