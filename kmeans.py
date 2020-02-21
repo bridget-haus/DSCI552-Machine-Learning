@@ -16,6 +16,8 @@ def main():
     plot_kmeans(cluster_list)
 
 
+
+
 def get_data(path):
 
     with open(path) as f:
