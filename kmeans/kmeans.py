@@ -7,7 +7,7 @@ import os
 def main():
 
     script_dir = os.path.dirname(__file__)
-    filename = 'clusters.txt'
+    filename = '../gmm/clusters.txt'
     path = os.path.join(script_dir, filename)
 
     data_array = get_data(path)

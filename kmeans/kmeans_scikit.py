@@ -59,7 +59,7 @@ def init_centroids(df, k, var1, var2):
     return centroid_list_a
 
 #INITIALIZATION
-txt_file = 'clusters.txt'
+txt_file = '../gmm/clusters.txt'
 list_rows = clean_data(txt_file)
 
 k = 3 #Number of specified clusters

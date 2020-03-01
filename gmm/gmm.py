@@ -12,6 +12,7 @@ matplotlib_axes_logger.setLevel('ERROR')
 
 
 def main():
+
     script_dir = os.path.dirname(__file__)
     filename = 'clusters.txt'
     path = os.path.join(script_dir, filename)
