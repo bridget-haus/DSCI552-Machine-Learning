@@ -53,7 +53,7 @@ def distance_function(object1, object2, coordinate_map, data_dict):
 	if object1 == object2:
 		return 0, object2
 
-	# original distance comes from the data fastmap-data text file
+	# original distance comes from the fastmap-data text file
 	old_distance = data_dict[object1][object2]
 	subtractors = 0
 
