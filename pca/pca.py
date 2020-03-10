@@ -39,12 +39,17 @@ def pca_transform(data_list_std, k):
     
     #Compute e-values and e-vectors from covariance matrix
     e_values, e_vectors_t = la.eig(cov_data)
+
     e_vectors = np.transpose(e_vectors_t)
+    first_vector = e_vectors[0].dot(-1) #Fix the negative signs for first e-vector
+    e_vectors2 = np.vstack((first_vector, e_vectors[1:]))
+    e_vectors2_t = np.transpose(e_vectors2)
+
     print('PC Eigenvalues: ', e_values)
-    print('PC Eigenvectors: ' + '\n', e_vectors)
+    print('PC Eigenvectors: ' + '\n', e_vectors2)
     
     #Construct a projection matrix W from the “top” k eigenvectors
-    e_pairs = [(np.abs(e_values[i]), e_vectors_t[:, i]) for i in range(len(e_values))]
+    e_pairs = [(np.abs(e_values[i]), e_vectors2_t[:, i]) for i in range(len(e_values))]
 
     # Sort the (eigenvalue, eigenvector) pairs from high to low
     e_pairs.sort(key=lambda k: k[0], reverse=True)
