@@ -29,7 +29,7 @@ def clean_data(data_text):
 
     return data_list_std
 
-def pca_transform(data_list_std):
+def pca_transform(data_list_std, k):
     ''' Take in the dataset and reduce it to k dimensions using PCA method.
     data_list_std - standardized np array, output from clean_data()
     '''
@@ -49,10 +49,16 @@ def pca_transform(data_list_std):
     # Sort the (eigenvalue, eigenvector) pairs from high to low
     e_pairs.sort(key=lambda k: k[0], reverse=True)
 
-    #Select the top two e_vector sets (k_dim = 2) from e_pairs
-    #TODO: Make k_dim and input parameter
-    w = np.hstack((e_pairs[0][1][:, np.newaxis], e_pairs[1][1][:, np.newaxis]))
-    
+    #Select the top two e_vector sets (k_dim) from e_pairs
+    #w = np.hstack((e_pairs[0][1][:, np.newaxis], e_pairs[1][1][:, np.newaxis]))
+
+    best_pairs = []
+    for i in range(k):
+        pair = e_pairs[i][1].reshape(len(cov_data), 1)
+        best_pairs.append(pair)
+
+    w = np.hstack(best_pairs)
+
     #Transform the d-dimensional input dataset, using the projection matrix W 
     # to obtain the new k-dimensional feature subspace.
     data_list_pca = data_list_std.dot(w)
@@ -74,10 +80,11 @@ def pca_transform(data_list_std):
     plt.show()
 
 
+
 def main():
     data_text = 'pca-data.txt'
     data_list_np = clean_data(data_text)
-    pca_transform(data_list_np)
+    pca_transform(data_list_np, 2)
 
 if __name__ == "__main__":
     main()
