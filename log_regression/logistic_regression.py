@@ -17,7 +17,7 @@ def error(countcorrect,len_vals):
     error = round(1 - int(countcorrect) / len_vals,4)
     return error
 
-filename = 'C:\\Users\Peter\\Desktop\\Classes\\INF 552\\Homework 4\\classification.txt'
+filename = 'classification.txt'
 X_data = []
 Y_data = []
 eta = -.05 #learning late
