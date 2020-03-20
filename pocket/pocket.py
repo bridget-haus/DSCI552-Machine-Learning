@@ -220,7 +220,7 @@ def main():
 
     X_anchor, W = initialize_params(X)
 
-    learning_rate = .1
+    learning_rate = 1
     max_iters = 7000
     W, best_W, iter_misclasses, iter_accuracies, iter_best_incorrect_predictions, iter_best_accuracies = pocket(X_anchor, Y, W, learning_rate, max_iters)
     print('Final weights:' + '\n', W)
