@@ -1,6 +1,6 @@
 from sklearn.linear_model import LinearRegression
 import numpy as np
-filename = 'C:\\Users\Peter\\Desktop\\Classes\\INF 552\\Homework 4\\linear-regression.txt'
+filename = 'linear-regression.txt'
 
 X_data = []
 Y_data = []
