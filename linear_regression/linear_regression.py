@@ -1,6 +1,6 @@
 import numpy as np
 
-filename = 'C:\\Users\Peter\\Desktop\\Classes\\INF 552\\Homework 4\\linear-regression.txt'
+filename = 'linear-regression.txt'
 X_data = []
 Y_data = []
 with open(filename, "r") as file:
