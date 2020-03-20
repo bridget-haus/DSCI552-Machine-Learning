@@ -48,7 +48,7 @@ with open(filename, "r") as file:
     
     print(weights)
     
-    prediction = np.dot(X, weights.T)
+    prediction = np.dot(X_data, weights.T)
     for i in range(len(prediction)):
         if prediction[i]>0:
             my_predict = 1
