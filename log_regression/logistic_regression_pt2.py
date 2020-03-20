@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
+import numpy as np
 filename = 'C:\\Users\Peter\\Desktop\\Classes\\INF 552\\Homework 4\\classification.txt'
 X_data = []
 Y_data = []
