@@ -108,7 +108,7 @@ def initialize_params(X):
     W = np.random.rand(num_dims+1).reshape((-1,1))
     return X_anchor, W
 
-def learn_perceptron(X_anchor, Y, W, learning_rate, max_iters):
+def learn_perceptron(X_anchor, Y, W, learning_rate):
     '''Given and initialized X and W, implement perceptron learning to optimize W
     X_anchor - rows of datapoints, with anchor: x0 = 1
     Y - column of labels
@@ -146,11 +146,7 @@ def learn_perceptron(X_anchor, Y, W, learning_rate, max_iters):
         accuracy = round((correct_predictions/num_xis), 5)
         iter_accuracy = (iter_counter, accuracy)
         iter_accuracies.append(iter_accuracy)
-        #print(iter_accuracies)
 
-        #Break from while loop if max_iters is reached
-        if iter_counter >= max_iters:
-            break
     return W, iter_misclasses, iter_accuracies
 
 def plot_performance(iter_misclasses, iter_accuracies):
@@ -199,9 +195,9 @@ def main():
     X_anchor, W = initialize_params(X)
 
     learning_rate = 0.1
-    max_iters = 50
-    W, iter_misclasses, iter_accuracies = learn_perceptron(X_anchor, Y, W, learning_rate, max_iters)
+    W, iter_misclasses, iter_accuracies = learn_perceptron(X_anchor, Y, W, learning_rate)
     print('Final weights:' + '\n', W)
+    print('Final iteration and accuracy:' + '\n', iter_accuracies[-1])
     
     plot_performance(iter_misclasses, iter_accuracies)
 

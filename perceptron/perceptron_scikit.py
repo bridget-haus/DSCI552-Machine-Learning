@@ -20,7 +20,7 @@ def get_inputs(file):
     return X, y
 
 def learn_perceptron(X, y):
-    clf = Perceptron(max_iter=50, eta0=.1, tol=None)
+    clf = Perceptron(max_iter=20000, eta0=.1, tol=None)
     clf.fit(X,y)
 
     w_intercept = clf.intercept_ #final weight for x0

@@ -155,7 +155,6 @@ def pocket(X_anchor, Y, W, learning_rate, max_iters):
         accuracy = round((correct_predictions/num_xis), 5)
         iter_accuracy = (iter_counter, accuracy)
         iter_accuracies.append(iter_accuracy)
-        #print(iter_accuracies)
         
         #Pocket algorithm
         if incorrect_predictions < best_incorrect_predictions:
@@ -224,6 +223,7 @@ def main():
     max_iters = 7000
     W, best_W, iter_misclasses, iter_accuracies, iter_best_incorrect_predictions, iter_best_accuracies = pocket(X_anchor, Y, W, learning_rate, max_iters)
     print('Final weights:' + '\n', W)
+    print('Final iteration and accuracy:' + '\n', iter_accuracies[-1])
     
     plot_performance(iter_best_incorrect_predictions, iter_best_accuracies)
 
