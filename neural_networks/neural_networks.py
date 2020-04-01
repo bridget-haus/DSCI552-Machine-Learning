@@ -1,29 +1,32 @@
 from PIL import Image
 import random
-from random import seed
 from math import exp
 
 
 def main():
 
-	normalize_dataset('downgesture_train.list.txt')
+	dataset = normalize_dataset('downgesture_train.list.txt')
 
-	seed(1)
 	hidden_layer, output_layer = initialize_weights(2, 1, 2)
 	print(hidden_layer)
 	print(output_layer)
+	inputs = dataset[0]
+	_, output = feed_forward(hidden_layer, output_layer, inputs)
+	for o in output:
+		print(o['output'])
 
 
 # iterate through training list and create dataset of pixels
 def normalize_dataset(file):
-	with open(file, 'r') as train_data:
 
+	with open(file, 'r') as train_data:
 		lines = train_data.read().splitlines()
 		dataset = []
 		for line in lines:
 			img = Image.open(line)
 			grey_img = img.convert(mode='L')
 			pix_val = list(grey_img.getdata())
+			# normalize pixels to values between 0 and 1
 			for i in range(len(pix_val)):
 				pix_val[i] = pix_val[i]/255
 			# append label to pixel dataset
@@ -75,16 +78,20 @@ def sigmoid(sum_wx):
 
 
 # Push inputs through network to generate output
-def feed_forward(network, row):
-	inputs = row
-	for layer in network:
-		new_inputs = []
-		for neuron in layer:
-			activation = activate(neuron['weights'], inputs)
-			neuron['output'] = transfer(activation)
-			new_inputs.append(neuron['output'])
-		inputs = new_inputs
-	return inputs
+def feed_forward(hidden_layer, output_layer, inputs):
+
+	# for each perceptron, we calculate output by taking the sigmoid function of the sum of inputs
+	for h_perceptron in hidden_layer:
+		sum_wx = summation(inputs, h_perceptron['w'])
+		h_perceptron['output'] = sigmoid(sum_wx)
+	for o_perceptron in output_layer:
+		sum_wx = summation(inputs, o_perceptron['w'])
+		o_perceptron['output'] = sigmoid(sum_wx)
+
+	return hidden_layer, output_layer
+
+# standard squared error = sum [(label - prediction)^2]
+
 
 if __name__ == '__main__':
 	main()
