@@ -1,18 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 #GOAL: Implement a feed-forward neural network in scikit-learn
 from PIL import Image
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report,confusion_matrix
-
-
-# In[2]:
-
 
 def normalize_dataset(file):
     '''iterate through training/test list and create dataset of pixels
@@ -36,10 +26,6 @@ def normalize_dataset(file):
             dataset.append(pix_val)
     return dataset
 
-
-# In[3]:
-
-
 def split_xy(dataset):
     '''Re-format the X and Y training values
     dataset - output from normalize_dataset'''
@@ -49,10 +35,6 @@ def split_xy(dataset):
         X_train.append(row[:-1])
         Y_train.append(row[-1])
     return X_train, Y_train
-
-
-# In[4]:
-
 
 def main():
     #Get training data
@@ -73,8 +55,8 @@ def main():
     mlp.fit(X_train,Y_train)
     
     #Get testing data
-    train_data = normalize_dataset('downgesture_test.list.txt')
-    X_test, Y_test = split_xy(train_data)
+    test_data = normalize_dataset('downgesture_test.list.txt')
+    X_test, Y_test = split_xy(test_data)
     
     #Use model to get predictions on test images
     predictions = mlp.predict(X_test)
@@ -83,16 +65,5 @@ def main():
     print(classification_report(Y_test,predictions))
     print(confusion_matrix(Y_test,predictions))
 
-
-# In[5]:
-
-
 if __name__ == "__main__":
     main()
-
-
-# In[ ]:
-
-
-
-
