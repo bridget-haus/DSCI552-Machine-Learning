@@ -3,7 +3,6 @@ from random import seed
 import random
 from PIL import Image
 
-# iterate through training list and create dataset of pixels
 def normalize_dataset(file):
 	'''Iterate through each .pgm file in list to create list of pixels. 
 	input: file - containing list of filenames (i.e. downgesture_train.list.txt
@@ -26,7 +25,6 @@ def normalize_dataset(file):
 			else:
 				pix_val.append(0)
 			dataset.append(pix_val)
-
 	return dataset
 
 def initialize_network(n_inputs, n_hidden, n_outputs):
@@ -37,9 +35,11 @@ def initialize_network(n_inputs, n_hidden, n_outputs):
 	input: n_hidden - user specified # of perceptrons in hidden layer
 	input: n_outputs - # of distinct labels'''
 	network = []
+
 	#bias is added with + 1
 	hidden_layer = [{'weights': [random.uniform(-.01, .01) for i in range(n_inputs + 1)]} for i in range(n_hidden)]
 	network.append(hidden_layer)
+
 	#bias is added with + 1 
 	output_layer = [{'weights': [random.uniform(-.01, .01) for i in range(n_hidden + 1)]} for i in range(n_outputs)]
 	network.append(output_layer)
@@ -79,7 +79,6 @@ def feed_forward(network, inputs):
 		inputs = new_inputs
 	return inputs #only outputs of the last layer are returned
 
-
 def backward_propagate_error(network, expected):
 	'''Starting with the last layer, working backwards, calculates the delta term
 	for each perceptron. Each perceptron's delta is then added to the network structure'''
@@ -103,10 +102,18 @@ def backward_propagate_error(network, expected):
 
 # Update network weights with error
 def update_weights(network, row, l_rate):
+	'''For each layer, for each perceptron, update the perceptron's weights.
+	Update each perceptron's weights considering l_rate * delta * previous_input
+	Update each perceptron's bias weight by l_rate * delta
+	The # of weights for a perceptron, is determined that perceptron's layer
+	input: network - neural net structure
+	input: row - single training element with label, list
+	input: l_rate - learning rate used in the SGD step'''
 
 	for i in range(len(network)):
 		inputs = row[:-1]
-		#If we aren't in the first layer, select inputs to be the outputs of the previous layer
+		#If we aren't in the first layer, 
+		#select inputs to be the outputs of the previous layer
 		if i != 0: 
 			inputs = [perceptron['output'] for perceptron in network[i - 1]]
 		for perceptron in network[i]:
@@ -114,8 +121,10 @@ def update_weights(network, row, l_rate):
 				perceptron['weights'][j] += l_rate * perceptron['delta'] * inputs[j]
 			perceptron['weights'][-1] += l_rate * perceptron['delta']
 
-# Train a network for a fixed number of epochs
 def train_network(network, dataset, l_rate, n_epoch, n_outputs):
+	'''Given a # of epochs, train a network example-by-example. 
+	After each image example, calculate error and back propagate error recursively 
+	through the pre-existing weights.'''
 	for epoch in range(n_epoch):
 		sum_error = 0
 		for row in dataset:
@@ -128,7 +137,6 @@ def train_network(network, dataset, l_rate, n_epoch, n_outputs):
 			backward_propagate_error(network, expected)
 			update_weights(network, row, l_rate)
 		print('>epoch=%d, error=%.3f' % (epoch, sum_error))
-
 
 def predict(network, row):
 	outputs = feed_forward(network, row)
