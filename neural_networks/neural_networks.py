@@ -1,13 +1,20 @@
 from math import exp
-from random import seed
 import random
 from PIL import Image
-
 import numpy as np #For visualization
 import matplotlib.pyplot as plt #For visualization
 
+
+def main():
+
+	n_hidden = 20
+	l_rate = 0.1
+	epochs = 10
+	test_model(n_hidden, l_rate, epochs)
+
+
 def normalize_dataset(file):
-	'''Iterate through each .pgm file in list to create list of pixels. 
+	'''Iterate through each .pgm file in list to create list of pixels.
 	input: file - containing list of filenames (i.e. downgesture_train.list.txt)
 	output: dataset - list of lists
 	'''
@@ -28,25 +35,33 @@ def normalize_dataset(file):
 			else:
 				pix_val.append(0)
 			dataset.append(pix_val)
+
 	return dataset
 
-def initialize_network(n_inputs, n_hidden, n_outputs):
-	'''Initialize a set of hidden layer weights and outout layer weights.
-	Final output will be a list-of-lists, one list per layer.
-	In both hidden and ouput layer lists, one dict per perceptron. Each dict has # weights = # input xis.
-	input: n_inputs - # of xis per record/image
-	input: n_hidden - user specified # of perceptrons in hidden layer
-	input: n_outputs - # of distinct labels'''
-	network = []
 
-	#bias is added with + 1
-	hidden_layer = [{'weights': [random.uniform(-.01, .01) for i in range(n_inputs + 1)]} for i in range(n_hidden)]
-	network.append(hidden_layer)
+def create_layers(num_inputs, num_hidden, num_outputs):
 
-	#bias is added with + 1 
-	output_layer = [{'weights': [random.uniform(-.01, .01) for i in range(n_hidden + 1)]} for i in range(n_outputs)]
-	network.append(output_layer)
-	return network
+	hidden_layer = []
+	# initialize random weight for each input to connect to hidden + bias
+	for i in range(num_hidden):
+		input_weights = []
+		for j in range(num_inputs + 1):
+			input_weights.append(random.uniform(-.01, .01))
+		i_weights = {'weights': input_weights}
+		hidden_layer.append(i_weights)
+	output_layer = []
+	# initialize random weight for each hidden to connect to output + bias
+	for i in range(num_outputs):
+		output_weights = []
+		for j in range(num_hidden + 1):
+			output_weights.append(random.uniform(-.01, .01))
+		o_weights = {'weights': output_weights}
+		output_layer.append(o_weights)
+
+	layers = [hidden_layer, output_layer]
+
+	return layers
+
 
 def summation(weights, inputs):
 	''' sum the weights * inputs
@@ -58,45 +73,49 @@ def summation(weights, inputs):
 		sum_wx += (inputs[i] * weights[i])
 	return sum_wx
 
+
 def sigmoid(sum_wx):
 	'''S(x) = 1/(1 + e^(-x))'''
 	return 1.0 / (1.0 + exp(-sum_wx))
 
+
 def sigmoid_derivative(output):
-	# S'(x) = x(1 - x)
+	'''S'(x) = x(1 - x)'''
 	return output * (1.0 - output)
 
-def feed_forward(network, inputs):
+
+def feed_forward(layers, inputs):
 	'''Push inputs through network to generate output
 	input: network - structure containing layer perceptrons and their weights
 	input: inputs - a list of attributes of single training item
 	output: inputs - list of sigmoid output of perceptrons in last layer
 	'''
-	for layer in network:
-		new_inputs = []
+	for layer in layers:
+		outputs = []
 		# for each perceptron, we calculate output by taking the sigmoid function of the sum of inputs
 		for perceptron in layer:
 			sum_wx = summation(perceptron['weights'], inputs)
 			perceptron['output'] = sigmoid(sum_wx) #Update the output of each perceptron
-			new_inputs.append(perceptron['output'])
+			outputs.append(perceptron['output'])
 
 		#after all perceptrons finish outputting
 		#set inputs to new_inputs to prepare for next layer
-		inputs = new_inputs
+		inputs = outputs
 
 	return inputs #only outputs of the last layer are returned
 
-def backward_propagate_error(network, expected):
+
+def backward_propagate_update(layers, expected, row, l_rate):
 	'''Starting with the last layer, working backwards, calculates the delta term
-	for each perceptron. Each perceptron's delta is then added to the network structure'''
-	for i in reversed(range(len(network))):
-		layer = network[i] #Select network layer
+	for each perceptron. Each perceptron's delta is then added to the layers structure'''
+	for i in reversed(range(len(layers))):
+		layer = layers[i] #Select network layer
 		errors = []
 
-		if i != len(network) - 1: #If we aren't in the last layer
+		if i != len(layers) - 1: #If we aren't in the last layer
 			for j in range(len(layer)):
 				error = 0.0
-				for perceptron in network[i + 1]:
+				for perceptron in layers[i + 1]:
 					error += (perceptron['weights'][j] * perceptron['delta'])
 				errors.append(error)
 		else: #If we are in the last layer
@@ -107,68 +126,58 @@ def backward_propagate_error(network, expected):
 			perceptron = layer[j]
 			perceptron['delta'] = errors[j] * sigmoid_derivative(perceptron['output'])
 
-# Update network weights with error
-def update_weights(network, row, l_rate):
-	'''For each layer, for each perceptron, update the perceptron's weights.
-	Update each perceptron's weights considering l_rate * delta * previous_input
-	Update each perceptron's bias weight by l_rate * delta
-	The # of weights for a perceptron, is determined that perceptron's layer
-	input: network - neural net structure
-	input: row - single training element with label, list
-	input: l_rate - learning rate used in the SGD step'''
-
-	for i in range(len(network)):
+	for i in range(len(layers)):
 		inputs = row[:-1]
-		#If we aren't in the first layer, 
+		#If we aren't in the first layer,
 		#select inputs to be the outputs of the previous layer
-		if i != 0: 
-			inputs = [perceptron['output'] for perceptron in network[i - 1]]
-		for perceptron in network[i]:
+		if i != 0:
+			inputs = [perceptron['output'] for perceptron in layers[i - 1]]
+		for perceptron in layers[i]:
 			for j in range(len(inputs)):
 				perceptron['weights'][j] += l_rate * perceptron['delta'] * inputs[j]
 			perceptron['weights'][-1] += l_rate * perceptron['delta']
 
-def train_network(network, dataset, l_rate, n_epoch, n_outputs):
-	'''Given a # of epochs, train a network example-by-example. 
-	After each image example, calculate error and back propagate error recursively 
+
+def train_layers(layers, dataset, l_rate, n_epoch, n_outputs):
+	'''Given a # of epochs, train a network example-by-example.
+	After each image example, calculate error and back propagate error recursively
 	through the pre-existing weights.'''
 	sum_errors = []
 	for epoch in range(n_epoch):
 		sum_error = 0
 		for row in dataset:
-			outputs = feed_forward(network, row)
+			outputs = feed_forward(layers, row)
 			expected = [0 for i in range(n_outputs)]
 			#If label = 1, then expected = [0, 1]
 			#Else if label = 0, then expected = [1, 0]
-			expected[row[-1]] = 1 
+			expected[row[-1]] = 1
 			sum_error += sum([(expected[i] - outputs[i]) ** 2 for i in range(len(expected))])
-			backward_propagate_error(network, expected)
-			update_weights(network, row, l_rate)
-		print('>epoch=%d, error=%.3f' % (epoch, sum_error))
+			backward_propagate_update(layers, expected, row, l_rate)
+		print(f'epoch={epoch}, error={sum_error}')
 		sum_errors.append(sum_error)
 	sum_errors = enumerate(sum_errors, 1)
 	return sum_errors
 
-def predict(network, row):
+
+def predict(layers, row):
 	'''Get the outputs of the last layer and tell us which class index ranked higher. '''
-	outputs = feed_forward(network, row)
+	outputs = feed_forward(layers, row)
 	return outputs.index(max(outputs))
 
-def build_train_model(n_hidden, l_rate, epochs):
+
+def build_train_model(num_hidden, l_rate, epochs):
 	train_data = normalize_dataset('downgesture_train.list.txt')
-	n_inputs = len(train_data[0]) - 1
-	n_outputs = len(set([row[-1] for row in train_data])) #number of unique classes
-	# n_hidden = 10
-	# learning_rate = 0.1
-	# epochs = 10
-	network = initialize_network(n_inputs, n_hidden, n_outputs)
-	sum_errors = train_network(network, train_data, l_rate, epochs, n_outputs)
-	return network, sum_errors
+	num_inputs = len(train_data[0]) - 1
+	num_outputs = len(set([row[-1] for row in train_data])) #number of unique classes
+	layers = create_layers(num_inputs, num_hidden, num_outputs)
+	sum_errors = train_layers(layers, train_data, l_rate, epochs, num_outputs)
+	return layers, sum_errors
+
 
 class test_stats():
 	def __init__(self, accuracy_table):
-		'''Build up a confusion matrix to enable calculation of 
-		accuracy, precision, and recall. Then store then in the class object 
+		'''Build up a confusion matrix to enable calculation of
+		accuracy, precision, and recall. Then store then in the class object
 		for easy retreival later on.'''
 		confusion_table = []
 		sum_tn = 0
@@ -213,6 +222,7 @@ class test_stats():
 		self.sum_tp = sum_tp
 		self.total = total
 
+
 def plot_errors(iter_errors):
     '''Plot a y-axis graph of erros per iterations'''
     iters = []
@@ -234,12 +244,9 @@ def plot_errors(iter_errors):
     fig.tight_layout()
     plt.show()
 
-def test_model():
-	#Model parameters
-	n_hidden = 20
-	l_rate = 0.1
-	epochs = 100
-	#Train a neural network 
+
+def test_model(n_hidden, l_rate, epochs):
+	#Train a neural network
 	network, sum_errors = build_train_model(n_hidden, l_rate, epochs)
 	#load the test dataset
 	test_data = normalize_dataset('downgesture_test.list.txt')
@@ -260,5 +267,6 @@ def test_model():
 
 	plot_errors(sum_errors)
 
+
 if __name__ == '__main__':
-	test_model()
+	main()
