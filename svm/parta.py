@@ -87,6 +87,6 @@ class SVM:
     def _str__(self):
         return 'done'
 
-filename = 'C:\\Users\\Peter\\Desktop\\Classes\\INF 552\\Homework 6\\linsep.txt'
+filename = 'linsep.txt'
 p = SVM(filename)
 print(p)
