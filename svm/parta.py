@@ -20,6 +20,7 @@ class SVM:
         #self.kernel_function() --> create a kernel function for non linear data
         
     def hyperplane(self):
+        '''Identify each datapoint's alpha value'''
         self.xixj = np.zeros((self.rows, self.rows))
         self.yiyj = np.zeros((self.rows, self.rows))
         
