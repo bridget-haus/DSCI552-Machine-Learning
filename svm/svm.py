@@ -1,7 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
 
-
 def read_file(file):
     '''Read the classification.txt file. Output a list of lists.'''
     fd = open(file, "r")
