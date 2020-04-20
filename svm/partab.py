@@ -12,7 +12,6 @@ class SVM:
         self.X = self.dat[:,0:2]
         self.Y = self.dat[:,2]
         self.rows, self.cols = self.X.shape
-        self.omiga = 0.01
         self.gamma = .01
         root= tk.Tk()
         self.response = messagebox.askquestion('Question',"Is the data linear?")
@@ -26,7 +25,6 @@ class SVM:
         if self.response == 'yes':
             self.weights()
         self.plot()
-
         
     def Q(self):
         self.xixj = np.zeros((self.rows, self.rows))
