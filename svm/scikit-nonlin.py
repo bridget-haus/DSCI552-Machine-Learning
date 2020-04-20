@@ -8,8 +8,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 def main():
 
 	data, labels = get_data('nonlinsep.txt')
-	X_std, labels, svc = fit_svm(data, labels)
-	plot(X_std, labels, svc)
+	data, labels, svc = fit_svm(data, labels)
+	plot(data, labels, svc)
 
 
 def get_data(file):

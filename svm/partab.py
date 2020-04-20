@@ -3,9 +3,7 @@ import cvxopt
 import matplotlib.pyplot as plt
 from numpy import linalg as LA
 
-
 def main():
-
     print('Do you want to run this for linear or non-linear data?')
     response = input()
     if response == 'linear':
@@ -17,9 +15,8 @@ def main():
     else:
         print('please choose linear or non-linear')
 
-
 class SVM:
-
+    
     def __init__(self, filename, response):
         self.dat = np.loadtxt(filename,dtype='float',delimiter=',')
         self.X = self.dat[:,0:2]
@@ -36,7 +33,6 @@ class SVM:
             self.weights()
         self.plot(response, self.weights)
 
-        
     def Q(self):
         self.xixj = np.zeros((self.rows, self.rows))
         self.yiyj = np.zeros((self.rows, self.rows))
@@ -67,7 +63,6 @@ class SVM:
         print('\n alphas are:')
         print(self.alphas)
 
-
     def cvxopt_solve_qp(self, P, q, G=None, h=None, A=None, b=None):
     #     P = .5 * (P + P.T)  # make sure P is symmetric
         args = [cvxopt.matrix(P), cvxopt.matrix(q)]
@@ -79,7 +74,6 @@ class SVM:
         if 'optimal' not in sol['status']:
             return None
         return np.array(sol['x']).reshape((P.shape[1],))
-
 
     def support_vectors(self):
         self.sv_index = np.where(self.alphas>0.00001)[0]
@@ -95,7 +89,6 @@ class SVM:
         print(self.weights)
         return self.weights
 
-    
     def plot(self, response, weights):
         plt.scatter(self.X[:,0],self.X[:,1],c=self.Y)
         plt.scatter(self.sv_x[:,0],self.sv_x[:,1], marker = 'D')
@@ -113,14 +106,11 @@ class SVM:
             plt.plot(x_values, y_values)
             m = -weights[0] / weights[1]
             b = -self.intercept / weights[1]
-
             print(f'y = {m[0]}x + {b[0]}')
-
         plt.show()
         
     def _str__(self):
         return 'done'
-
 
 if __name__ == '__main__':
     main()

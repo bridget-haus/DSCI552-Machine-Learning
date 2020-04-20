@@ -8,9 +8,9 @@ from sklearn.metrics import classification_report, confusion_matrix
 def main():
 
 	data, labels = get_data('linsep.txt')
-	X_std, labels, xx, yy, svc, w, b = fit_svm(data, labels)
+	data, labels, xx, yy, svc, w, b = fit_svm(data, labels)
 	equation_of_line(w, b)
-	plot(X_std, labels, xx, yy, svc)
+	plot(data, labels, xx, yy, svc)
 
 
 def get_data(file):
