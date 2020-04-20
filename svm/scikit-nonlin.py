@@ -28,26 +28,24 @@ def get_data(file):
 
 def fit_svm(data, labels):
 
-	# Standarize features
-	scaler = StandardScaler()
-	X_std = scaler.fit_transform(data)
-
-
 	# Create support vector classifier
-	svc = svm.SVC(kernel='rbf', gamma=.1, C=10**(2))
+	svc = svm.SVC(kernel='rbf', gamma=.01, C=1000)
 
 	# Train model
-	svc.fit(X_std, labels)
+	svc.fit(data, labels)
 	print(f'there are {len(svc.support_vectors_)} support vectors: \n {svc.support_vectors_}')
 
-	return X_std, labels, svc
+	return data, labels, svc
 
 
-def plot(X_std, labels, svc):
+def plot(data, labels, svc):
 
 	# Plot data points and color using their class
 	color = ['red' if c == '+1' else 'blue' for c in labels]
-	plt.scatter(X_std[:,0], X_std[:,1], c=color)
+	for point in data:
+		x = [float(point[0]) for point in data]
+		y = [float(point[1]) for point in data]
+		plt.scatter(x, y, color=color)
 	plt.scatter(svc.support_vectors_[:, 0], svc.support_vectors_[:, 1], marker='D', c='black')
 
 	# Plot the hyperplane

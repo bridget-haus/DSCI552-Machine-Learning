@@ -25,7 +25,6 @@ class SVM:
         self.X = self.dat[:,0:2]
         self.Y = self.dat[:,2]
         self.rows, self.cols = self.X.shape
-        self.omiga = 0.01
         self.gamma = .01
         if response == 'linear':
             self.Q()
