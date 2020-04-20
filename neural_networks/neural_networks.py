@@ -74,8 +74,8 @@ def create_layers(num_inputs, num_hidden, num_outputs):
 	return layers
 
 def summation(weights, inputs):
-	# sum_wx = sum(w1x1 + w2x2 + ... + wdxd) + bias
-	# w = weight, x = input
+	#sum_wx = sum(w1x1 + w2x2 + ... + wdxd) + bias
+	w = weight, x = input
 
 def summation(weights, inputs):
 	''' sum the weights * inputs
@@ -284,7 +284,6 @@ def test_model(n_hidden, l_rate, epochs):
 	print('Recall: ', test_results.recall)
 
 	plot_errors(sum_errors)
->>>>>>> 5f9c45b6ef8fe8a30f4361c5add68e58d6a5234a
 
 # Push inputs through network to generate output
 def feed_forward(network, inputs):
