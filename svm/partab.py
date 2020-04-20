@@ -5,7 +5,6 @@ from numpy import linalg as LA
 
 
 def main():
-
     print('Do you want to run this for linear or non-linear data?')
     response = input()
     if response == 'linear':
@@ -17,15 +16,12 @@ def main():
     else:
         print('please choose linear or non-linear')
 
-
 class SVM:
-
     def __init__(self, filename, response):
         self.dat = np.loadtxt(filename,dtype='float',delimiter=',')
         self.X = self.dat[:,0:2]
         self.Y = self.dat[:,2]
         self.rows, self.cols = self.X.shape
-        self.omiga = 0.01
         self.gamma = .01
         if response == 'linear':
             self.Q()
@@ -37,7 +33,6 @@ class SVM:
             self.weights()
         self.plot(response, self.weights)
 
-        
     def Q(self):
         self.xixj = np.zeros((self.rows, self.rows))
         self.yiyj = np.zeros((self.rows, self.rows))
@@ -67,7 +62,6 @@ class SVM:
         self.alphas = self.cvxopt_solve_qp(P, q, G, h, A, b)
         print('\n alphas are:')
         print(self.alphas)
-
 
     def cvxopt_solve_qp(self, P, q, G=None, h=None, A=None, b=None):
     #     P = .5 * (P + P.T)  # make sure P is symmetric
