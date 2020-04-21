@@ -4,17 +4,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix
 
-
 def main():
-
 	data, labels = get_data('linsep.txt')
 	data, labels, xx, yy, svc, w, b = fit_svm(data, labels)
 	equation_of_line(w, b)
 	plot(data, labels, xx, yy, svc)
 
-
 def get_data(file):
-
 	with open(file, "r") as fd:
 		rows = fd.read().splitlines()
 		data = []
@@ -23,12 +19,9 @@ def get_data(file):
 			row_list = row.split(',')
 			data.append(row_list[:-1])
 			labels.append(row_list[-1])
-
 	return data, labels
 
-
 def fit_svm(data, labels):
-
 	# Create support vector classifier
 	svc = svm.SVC(kernel='linear', C=1000)
 
@@ -50,7 +43,6 @@ def fit_svm(data, labels):
 
 
 def plot(data, labels, xx, yy, svc):
-
 	# Plot data points and color using their class
 	color = ['red' if c == '+1' else 'blue' for c in labels]
 	for point in data:
@@ -64,14 +56,10 @@ def plot(data, labels, xx, yy, svc):
 	plt.plot(xx, yy)
 	plt.axis("off"), plt.show()
 
-
 def equation_of_line(weights, intercept):
-
 	m = -weights[0]/weights[1]
 	b = -intercept / weights[1]
-
 	print(f'y = {m}x + {b[0]}')
-
 
 if __name__ == '__main__':
 	main()
