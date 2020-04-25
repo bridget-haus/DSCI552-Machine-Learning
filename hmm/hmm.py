@@ -31,23 +31,37 @@ def get_data(filename):
 	return grid, towers, noisy_distance
 
 
-def free_neighbors(x, y, grid):
+def trajectory_probability(x_prior, y_prior, x, y, grid):
 
-	# given x,y coordinate check grid and asses how many neighbors are available
+	# given x_prior,y_prior coordinates check grid and assess how many neighbors are available
 
 	free_neighbors = 0
 
-	if x-1 >= 0 and grid[x-1][y]==1:
+	if x_prior-1 >= 0 and grid[x_prior-1][y_prior]==1: # moving left is available
 		free_neighbors += 1
-	if x+1 <= 10 and grid[x+1][y]==1:
+	if x_prior+1 <= 9 and grid[x_prior+1][y_prior]==1: # moving right is available
 		free_neighbors += 1
-	if y-1 >= 0 and grid[x][y-1]==1:
+	if y_prior-1 >= 0 and grid[x_prior][y_prior-1]==1: # moving down is available
 		free_neighbors += 1
-	if y+1 <= 10 and grid[x][y+1] ==1:
+	if y_prior+1 <= 9 and grid[x_prior][y_prior+1]==1: # moving up is available
 		free_neighbors += 1
 
-	print(free_neighbors)
+	# given number of available neighbors, calculate probability you moved to new coordiantes
+
+	if x-1 == x_prior and y == y_prior and grid[x][y] == 1: # probability of moving left
+		print(1/free_neighbors)
+	elif x+1 == x_prior and y == y_prior and grid[x][y] == 1: # probability of moving right
+		print(1/free_neighbors)
+	elif x == x_prior and y == y_prior-1 and grid[x][y] == 1: # probability of moving down
+		print(1/free_neighbors)
+	elif x == x_prior and y == y_prior+1 and grid[x][y] == 1: # probability of moving up
+		print(1/free_neighbors)
+	else:
+		print(0)
 
 
 grid, towers, noisy_distance = get_data('hmm-data.txt')
-free_neighbors(3, 3, grid)
+
+# this is the proabbility that if you start at (0,0) you will move to (0,1)
+trajectory_probability(0, 0, 0, 1, grid)
+
