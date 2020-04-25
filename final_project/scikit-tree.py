@@ -63,7 +63,7 @@ def predict(clf, data_test, labels_test):
 
 	# plot confusion matrix
 	ax = plt.subplot()
-	sns.heatmap(cm, annot=True, ax=ax, fmt="d");  # annot=True to annotate cells
+	sns.heatmap(cm, annot=True, ax=ax, fmt="d")  # annot=True to annotate cells
 	ax.set_xlabel('Predicted labels')
 	ax.set_ylabel('True labels')
 	ax.set_title('Confusion Matrix')
