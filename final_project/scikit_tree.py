@@ -10,7 +10,6 @@ from sklearn.metrics import accuracy_score
 
 
 def main():
-
 	class_names, feature_names, data_train, data_test, labels_train, labels_test = split_train_test('data.csv')
 	clf = decision_tree(class_names, feature_names, data_train, labels_train)
 	predict(clf, data_test, labels_test)
@@ -49,7 +48,6 @@ def decision_tree(class_names, feature_names, data_train, labels_train):
 	# convert .dot file to .png
 	os.system('dot -Tpng tree.dot -o tree.png')
 	return clf
-
 
 def predict(clf, data_test, labels_test):
 
