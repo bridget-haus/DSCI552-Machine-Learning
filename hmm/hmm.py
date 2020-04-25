@@ -31,4 +31,23 @@ def get_data(filename):
 	return grid, towers, noisy_distance
 
 
-get_data('hmm-data.txt')
+def free_neighbors(x, y, grid):
+
+	# given x,y coordinate check grid and asses how many neighbors are available
+
+	free_neighbors = 0
+
+	if x-1 >= 0 and grid[x-1][y]==1:
+		free_neighbors += 1
+	if x+1 <= 10 and grid[x+1][y]==1:
+		free_neighbors += 1
+	if y-1 >= 0 and grid[x][y-1]==1:
+		free_neighbors += 1
+	if y+1 <= 10 and grid[x][y+1] ==1:
+		free_neighbors += 1
+
+	print(free_neighbors)
+
+
+grid, towers, noisy_distance = get_data('hmm-data.txt')
+free_neighbors(3, 3, grid)
