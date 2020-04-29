@@ -1,6 +1,6 @@
 import numpy as np
 import math
-
+import pandas as pd
 
 def get_data(filename):
 
@@ -32,7 +32,6 @@ def get_data(filename):
 
 	return grid, towers, noisy_distance
 
-
 def trajectory_probability(x_prior, y_prior, x, y, grid):
 
 	# given x_prior,y_prior coordinates check grid and assess how many neighbors are available
@@ -61,7 +60,6 @@ def trajectory_probability(x_prior, y_prior, x, y, grid):
 	else:
 		return 0
 
-
 def initial_probability(grid):
 
 	valid_cells = {}
@@ -86,7 +84,6 @@ def initial_probability(grid):
 
 	return valid_cells, init_prob
 
-
 def transition_matrix(valid_cells, grid):
 
 	# initialize 87x87 matrix to represent 87 free cells
@@ -104,48 +101,62 @@ def transition_matrix(valid_cells, grid):
 
 	return trans_matrix
 
-
 def dist_to_tower_range(valid_cells, towers):
 
-	# euclidean distance = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+    # euclidean distance = sqrt((x2 - x1)^2 + (y2 - y1)^2)
 
-	min_rand_noise = 0.7
-	max_rand_noise = 1.3
+    min_rand_noise = 0.7
+    max_rand_noise = 1.3
 
-	dist_tower_range = {}
-	for cell in valid_cells.values():
-		coordinates = tuple(cell)
-		dist_list = []
-		for tower in towers:
-			dist = math.sqrt((cell[0] - tower[0])**2 + (cell[1] - tower[1])**2)
-			# include min and max random noise to generate possible range
-			random_noise = [round(dist * min_rand_noise,1), round(dist * max_rand_noise,1)]
-			dist_list.append(random_noise)
-		# dict with 87 values. key = free cells and values = list of ranges to 4 towers
-		dist_tower_range[coordinates] = dist_list
+    dist_tower_range = pd.DataFrame()
 
-	return dist_tower_range
+    coordinates_list = valid_cells.values()
+    dist_tower_range['coordinates'] = coordinates_list
+    
+    towers_e = enumerate(towers, 1)
+    for i, tower in towers_e:
+        tower_dists = []
+        for cell in coordinates_list:
+            dist = math.sqrt((cell[0] - tower[0])**2 + (cell[1] - tower[1])**2)
+            # include min and max random noise to generate possible range
+            random_noise = [round(dist * min_rand_noise,1), round(dist * max_rand_noise,1)]
+            tower_dists.append(random_noise)
+        dist_tower_range[i] = tower_dists
 
+    return dist_tower_range
 
-def likely_free_cells(valid_cells, noisy_distance, dist_tower_range):
+def find_obs_likely_cells(noisy_distance, dist_tower_range):
+    '''For each observation distances, find a set of likely cell indexes from the 87 valid cells.'''
+    obs_likely_cells = {}
+    for i, obs in enumerate(noisy_distance, 1):
 
-	coord_list = []
-	for key in valid_cells.keys():
-		coordinates = tuple(valid_cells[key])
-		count = 0
-		for i in range(0,4):
-			# for each free cell and for each tower, check if noisy distance recorded is in valid range
-			tower = noisy_distance[i]
-			min = dist_tower_range[coordinates][i][0]
-			max = dist_tower_range[coordinates][i][1]
-			if min <= tower[i] <= max:
-				count += 1
-		if count == 4:
-			# if coordinate is in valid range of tower distances, append
-			coord_list.append(coordinates)
+        obs_i = enumerate(obs, 1)
 
-	return coord_list
+        #Select the coordinates of all valid cells
+        tow_coords = dist_tower_range.loc[:, 1]
+        tow_indexes = list(tow_coords.index.values)
 
+        #For each observation's tower_dist
+        for j, tower_dist in obs_i:
+
+            #find cells that that contain the observation's tower_dist
+            tower_matches = []
+            for index, coord in zip(tow_indexes, tow_coords):
+                if tower_dist >= coord[0] and tower_dist <= coord[1]:
+                    tower_matches.append(int(index))
+
+            #When the last tower is evaluated, don't need to update the tow_coords
+            try: 
+                tow_coords_next = dist_tower_range.loc[tower_matches, j+1]
+            except KeyError:
+                break
+
+            #Narrow down the likely tower coordinates, before checking the next tower
+            tow_coords = tow_coords_next
+            tow_indexes = list(tow_coords.index.values)
+
+        obs_likely_cells[i] = tower_matches
+    return obs_likely_cells
 
 # read txt file into data structures
 grid, towers, noisy_distance = get_data('hmm-data.txt')
@@ -163,10 +174,4 @@ transition_matrix(valid_cells, grid)
 dist_tower_range = dist_to_tower_range(valid_cells, towers)
 
 # given noisy distance, which cells are most probable during each 11 time-steps
-likely_cells = {}
-for i in range(0, 11):
-	coordinates = likely_free_cells(valid_cells, noisy_distance, dist_tower_range)
-	try:
-		likely_cells[i].append(coordinates)
-	except KeyError:
-		likely_cells[i] = [coordinates]
+obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range)
