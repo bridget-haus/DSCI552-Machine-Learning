@@ -93,7 +93,7 @@ def get_trans_neighbors(valid_cells, grid):
 def transition_matrix(free_neighbors):
     '''Create a constant transition matrix, which are probabilities of 
     transitioning to new state conditioned on hidden state.
-    Rows - prior valid cells, ascending from 1-87. Row values sum to 1.
+    Rows - prior valid cells, ascending from 1-87. Row values horizontally sum to 1.
     Columns - current valid cells, ascending from 1-87.
     Ex: Row one is for cell coordinates 0,1. Row two is for cell coordinates 0,1... etc.
     '''
@@ -167,6 +167,33 @@ def find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells):
         obs_likely_cells[i] = tower_matches
     return obs_likely_cells
 
+def emission_matrices(obs_likely_cells, free_neighbors):
+    '''Creates a list of emission matrixes, for each observation.
+    Within each emission matrix, Rows represent each likely cell
+    Rows - likely cells (i.e. evidence), given the robot's noisy distances from tower. Row values horizontally sum to 1.
+    Columns - current valid cells, ascending from 1-87.
+    '''
+    #Store each observation's emission matrix in a list
+    emis_matrix_list = []
+    #Generate emission matrix for each observation
+    for obs_index in obs_likely_cells.keys():
+        obs = obs_likely_cells.get(obs_index)
+        emis_matrix = np.zeros((len(obs), len(valid_cells)))
+        
+        #For each observation's likely cell
+        for i, likely_cell in enumerate(obs.keys()):
+            #look up likely cell's neighbors
+            neighbors = free_neighbors.get(likely_cell)
+
+            #Calculate uniform prob of moving to neighbor
+            len_neighbors = len(neighbors.keys())
+            prob = 1 / len_neighbors
+            #Add the probability to the emissions matrix
+            for neighbor in neighbors.keys():
+                emis_matrix[i][neighbor-1] = prob
+        emis_matrix_list.append(emis_matrix)
+    return emis_matrix_list
+
 # read txt file into data structures
 grid, towers, noisy_distance = get_data('hmm-data.txt')
 
@@ -184,3 +211,6 @@ dist_tower_range = dist_to_tower_range(valid_cells, towers)
 
 # given noisy distance, which cells are most probable during each 11 time-steps
 obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells)
+
+# get emission matrix for each observation
+emis_matrix_list = emission_matrices(obs_likely_cells, free_neighbors)
