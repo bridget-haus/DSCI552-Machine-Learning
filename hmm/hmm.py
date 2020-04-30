@@ -61,28 +61,30 @@ def trajectory_probability(x_prior, y_prior, x, y, grid):
 		return 0
 
 def initial_probability(grid):
-
-	valid_cells = {}
-
-	counter = 1
-	x = 0
-	y = 0
-	for row in grid:
-		for column in row:
-			# if the cell is valid, create a dict where key = 1-87 free spaces and value = (x,y) coordinates
-			if column == 1:
-				valid_cells[counter] = [x, y]
-				counter += 1
-				y += 1
-			elif column == 0:
-				y += 1
-		y = 0
-		x += 1
-
-	# there are 87 valid cells to start. robot has uniform probability of starting in each of them
-	init_prob = 1/len(valid_cells)
-
-	return valid_cells, init_prob
+    '''Calculate probability of robot's initial position in any 1 cell.'''
+    valid_cells = {}
+    counter = 1
+    x = 0
+    y = 0
+    for row in grid:
+        for column in row:
+            # if the cell is valid, create a dict where key = 1-87 free spaces and value = (x,y) coordinates
+            if column == 1:
+                valid_cells[counter] = [x, y]
+                counter += 1
+                y += 1
+            elif column == 0:
+                y += 1
+        y = 0
+        x += 1
+        
+    # there are 87 valid cells to start. robot has uniform probability of starting in each of them
+    #Make a matrix with initial probability for each valid cell
+    init_prob = round((1/len(valid_cells)), 5)
+    I = {}
+    for key in valid_cells.keys():
+        I[key] = init_prob 
+    return valid_cells, init_prob, I
 
 def transition_matrix(valid_cells, grid):
 
@@ -165,7 +167,7 @@ grid, towers, noisy_distance = get_data('hmm-data.txt')
 probability = trajectory_probability(0, 0, 0, 1, grid)
 
 # probability of robot's initial position in any 1 cell
-valid_cells, init_prob = initial_probability(grid)
+valid_cells, init_prob, I = initial_probability(grid)
 
 # given previous cell, what is conditional probability robot moved to another cell
 transition_matrix(valid_cells, grid)
