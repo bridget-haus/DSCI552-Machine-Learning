@@ -86,6 +86,27 @@ def initial_probability(grid):
         I[key] = init_prob 
     return valid_cells, init_prob, I
 
+def get_trans_neighbors(valid_cells, grid):
+    '''Get coordinates of free neighbors for each valid cell.'''
+    free_neighbors_dict = {}
+    for key in valid_cells.keys():
+        free_neighbors = []
+
+        x_prior = valid_cells[key][0]
+        y_prior = valid_cells[key][1]
+
+        if x_prior-1 >= 0 and grid[x_prior-1][y_prior]==1: # moving left is available
+            free_neighbors.append([x_prior-1, y_prior])
+        if x_prior+1 <= 9 and grid[x_prior+1][y_prior]==1: # moving right is available
+            free_neighbors.append([x_prior+1, y_prior])
+        if y_prior-1 >= 0 and grid[x_prior][y_prior-1]==1: # moving down is available
+            free_neighbors.append([x_prior, y_prior-1])
+        if y_prior+1 <= 9 and grid[x_prior][y_prior+1]==1: # moving up is available
+            free_neighbors.append([x_prior, y_prior+1])
+
+        free_neighbors_dict[key] = free_neighbors
+    return free_neighbors_dict
+
 def transition_matrix(valid_cells, grid):
 
 	# initialize 87x87 matrix to represent 87 free cells
@@ -170,7 +191,10 @@ probability = trajectory_probability(0, 0, 0, 1, grid)
 valid_cells, init_prob, I = initial_probability(grid)
 
 # given previous cell, what is conditional probability robot moved to another cell
-transition_matrix(valid_cells, grid)
+T = transition_matrix(valid_cells, grid)
+
+#Get coordinates of free neighbors for each valid cell
+free_neighbors_dict = get_trans_neighbors(valid_cells, grid)
 
 # distance from every free cell to tower with random noise element
 dist_tower_range = dist_to_tower_range(valid_cells, towers)
