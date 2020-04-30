@@ -205,11 +205,11 @@ probability = trajectory_probability(0, 0, 0, 1, grid)
 # probability of robot's initial position in any 1 cell
 valid_cells, init_prob, I = initial_probability(grid)
 
-# given previous cell, what is conditional probability robot moved to another cell
-trans_matrix = transition_matrix(free_neighbors)
-
 #Get coordinates of free neighbors for each valid cell
 free_neighbors = get_trans_neighbors(valid_cells, grid)
+
+# given previous cell, what is conditional probability robot moved to another cell
+trans_matrix = transition_matrix(free_neighbors)
 
 # distance from every free cell to tower with random noise element
 dist_tower_range = dist_to_tower_range(valid_cells, towers)
