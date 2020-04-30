@@ -135,11 +135,11 @@ def dist_to_tower_range(valid_cells, towers):
 
     return dist_tower_range
 
-def find_obs_likely_cells(noisy_distance, dist_tower_range):
-    '''For each observation distances, find a set of likely cell indexes from the 87 valid cells.'''
+def find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells):
+    '''For each observation distances, find a set of likely cell indexes from the 87 valid cells.
+    Use each observation's likely_cells to compute emissions matrix later on.'''
     obs_likely_cells = {}
     for i, obs in enumerate(noisy_distance, 1):
-
         obs_i = enumerate(obs, 1)
 
         #Select the coordinates of all valid cells
@@ -148,23 +148,22 @@ def find_obs_likely_cells(noisy_distance, dist_tower_range):
 
         #For each observation's tower_dist
         for j, tower_dist in obs_i:
-
             #find cells that that contain the observation's tower_dist
-            tower_matches = []
+            tower_matches = {}
             for index, coord in zip(tow_indexes, tow_coords):
                 if tower_dist >= coord[0] and tower_dist <= coord[1]:
-                    tower_matches.append(int(index))
+                    #Save the index and coordinate of the likely cell
+                    tower_matches[index] = valid_cells.get(index)
 
-            #When the last tower is evaluated, don't need to update the tow_coords
+            #When the last tower distances are checked for matches, don't update the tow_coords
             try: 
-                tow_coords_next = dist_tower_range.loc[tower_matches, j+1]
+                tow_coords_next = dist_tower_range.loc[list(tower_matches.keys()), j+1]
             except KeyError:
                 break
 
             #Narrow down the likely tower coordinates, before checking the next tower
             tow_coords = tow_coords_next
             tow_indexes = list(tow_coords.index.values)
-
         obs_likely_cells[i] = tower_matches
     return obs_likely_cells
 
@@ -184,4 +183,4 @@ trans_matrix = transition_matrix(free_neighbors)
 dist_tower_range = dist_to_tower_range(valid_cells, towers)
 
 # given noisy distance, which cells are most probable during each 11 time-steps
-obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range)
+obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells)
