@@ -118,22 +118,26 @@ def get_trans_neighbors(valid_cells, grid):
         free_neighbors_outer[key] = free_neighbors_inner
     return free_neighbors_outer
 
-def transition_matrix(valid_cells, grid):
+def transition_matrix(free_neighbors):
+    '''Create a constant transition matrix, which are probabilities of 
+    transitioning to new state conditioned on hidden state.
+    Rows - prior valid cells, ascending from 1-87. Row values sum to 1.
+    Columns - current valid cells, ascending from 1-87.
+    Ex: Row one is for cell coordinates 0,1. Row two is for cell coordinates 0,1... etc.
+    '''
+    # initialize 87x87 matrix to represent 87 free cells
+    trans_matrix = np.zeros((len(valid_cells), len(valid_cells)))
 
-	# initialize 87x87 matrix to represent 87 free cells
+    for key_out in free_neighbors.keys():
+        vals_outer = free_neighbors[key_out]
 
-	trans_matrix = np.zeros((len(valid_cells), len(valid_cells)))
-
-	for row in range(len(valid_cells)):
-		for column in range(len(valid_cells)):
-			# position of x_prior and y_prior at time t-1
-			x_prior, y_prior = valid_cells[row + 1]
-			# position of x, y at time t
-			x, y = valid_cells[column + 1]
-			# fill matrix with probability of every possible prior moving to every possible new
-			trans_matrix[row][column] = trajectory_probability(x_prior,y_prior, x, y, grid)
-
-	return trans_matrix
+        neighbor_count = len(vals_outer.keys())
+        prior_prob = round((1 / neighbor_count), 5)
+        
+        #Fill out the trans matrix, make sure rows sum to 1
+        for key_in in vals_outer:
+            trans_matrix[key_out -1][key_in-1] = prior_prob
+    return trans_matrix
 
 def dist_to_tower_range(valid_cells, towers):
 
@@ -202,10 +206,10 @@ probability = trajectory_probability(0, 0, 0, 1, grid)
 valid_cells, init_prob, I = initial_probability(grid)
 
 # given previous cell, what is conditional probability robot moved to another cell
-T = transition_matrix(valid_cells, grid)
+trans_matrix = transition_matrix(free_neighbors)
 
 #Get coordinates of free neighbors for each valid cell
-free_neighbors_dict = get_trans_neighbors(valid_cells, grid)
+free_neighbors = get_trans_neighbors(valid_cells, grid)
 
 # distance from every free cell to tower with random noise element
 dist_tower_range = dist_to_tower_range(valid_cells, towers)
