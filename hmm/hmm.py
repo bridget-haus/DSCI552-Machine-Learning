@@ -32,34 +32,6 @@ def get_data(filename):
 
 	return grid, towers, noisy_distance
 
-def trajectory_probability(x_prior, y_prior, x, y, grid):
-
-	# given x_prior,y_prior coordinates check grid and assess how many neighbors are available
-
-	free_neighbors = 0
-
-	if x_prior-1 >= 0 and grid[x_prior-1][y_prior]==1: # moving left is available
-		free_neighbors += 1
-	if x_prior+1 <= 9 and grid[x_prior+1][y_prior]==1: # moving right is available
-		free_neighbors += 1
-	if y_prior-1 >= 0 and grid[x_prior][y_prior-1]==1: # moving down is available
-		free_neighbors += 1
-	if y_prior+1 <= 9 and grid[x_prior][y_prior+1]==1: # moving up is available
-		free_neighbors += 1
-
-	# given number of available neighbors, calculate probability robot moved to new coordinates
-
-	if x-1 == x_prior and y == y_prior and grid[x][y] == 1: # probability of moving left
-		return 1/free_neighbors
-	elif x+1 == x_prior and y == y_prior and grid[x][y] == 1: # probability of moving right
-		return 1/free_neighbors
-	elif x == x_prior and y == y_prior-1 and grid[x][y] == 1: # probability of moving down
-		return 1/free_neighbors
-	elif x == x_prior and y == y_prior+1 and grid[x][y] == 1: # probability of moving up
-		return 1/free_neighbors
-	else:
-		return 0
-
 def initial_probability(grid):
     '''Calculate probability of robot's initial position in any 1 cell.'''
     valid_cells = {}
@@ -198,9 +170,6 @@ def find_obs_likely_cells(noisy_distance, dist_tower_range):
 
 # read txt file into data structures
 grid, towers, noisy_distance = get_data('hmm-data.txt')
-
-# probability that if robot start at (0,0) robot will move to (0,1)
-probability = trajectory_probability(0, 0, 0, 1, grid)
 
 # probability of robot's initial position in any 1 cell
 valid_cells, init_prob, I = initial_probability(grid)
