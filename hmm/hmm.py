@@ -87,25 +87,36 @@ def initial_probability(grid):
     return valid_cells, init_prob, I
 
 def get_trans_neighbors(valid_cells, grid):
-    '''Get coordinates of free neighbors for each valid cell.'''
-    free_neighbors_dict = {}
+    '''For each valid cell, get the id and coordinates of its neighbor.
+    This structure will be used to populate the trans_matrix.'''
+    
+    #Use this for looking up neighbor cell id
+    validcells_keys = list(valid_cells.keys())
+    validcells_vals = list(valid_cells.values())
+    
+    free_neighbors_outer = {}
     for key in valid_cells.keys():
-        free_neighbors = []
+        
+        free_neighbors_inner = {}
 
         x_prior = valid_cells[key][0]
         y_prior = valid_cells[key][1]
 
         if x_prior-1 >= 0 and grid[x_prior-1][y_prior]==1: # moving left is available
-            free_neighbors.append([x_prior-1, y_prior])
+            nb_id = validcells_keys[validcells_vals.index([x_prior-1, y_prior])]
+            free_neighbors_inner[nb_id] = [x_prior-1, y_prior]
         if x_prior+1 <= 9 and grid[x_prior+1][y_prior]==1: # moving right is available
-            free_neighbors.append([x_prior+1, y_prior])
+            nb_id = validcells_keys[validcells_vals.index([x_prior+1, y_prior])]
+            free_neighbors_inner[nb_id] = [x_prior+1, y_prior]
         if y_prior-1 >= 0 and grid[x_prior][y_prior-1]==1: # moving down is available
-            free_neighbors.append([x_prior, y_prior-1])
+            nb_id = validcells_keys[validcells_vals.index([x_prior, y_prior-1])]
+            free_neighbors_inner[nb_id] = [x_prior, y_prior-1]
         if y_prior+1 <= 9 and grid[x_prior][y_prior+1]==1: # moving up is available
-            free_neighbors.append([x_prior, y_prior+1])
+            nb_id = validcells_keys[validcells_vals.index([x_prior, y_prior+1])]
+            free_neighbors_inner[nb_id] = [x_prior, y_prior+1]
 
-        free_neighbors_dict[key] = free_neighbors
-    return free_neighbors_dict
+        free_neighbors_outer[key] = free_neighbors_inner
+    return free_neighbors_outer
 
 def transition_matrix(valid_cells, grid):
 
