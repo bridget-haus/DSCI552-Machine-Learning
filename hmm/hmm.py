@@ -90,7 +90,7 @@ def get_trans_neighbors(valid_cells, grid):
         free_neighbors_outer[key] = free_neighbors_inner
     return free_neighbors_outer
 
-def transition_matrix(free_neighbors):
+def transition_matrix(free_neighbors, valid_cells):
     '''Create a constant transition matrix, which are probabilities of 
     transitioning to new state conditioned on hidden state.
     Rows - prior valid cells, ascending from 1-87. Row values sum to 1.
@@ -177,7 +177,7 @@ def find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells):
         obs_likely_cells[i] = tower_matches
     return obs_likely_cells
 
-def emission_matrices(obs_likely_cells, free_neighbors):
+def emission_matrices(obs_likely_cells, free_neighbors, valid_cells):
     '''Creates a list of emission matrixes, for each observation.
     Within each emission matrix, Rows represent each likely cell
     Rows - likely cells (i.e. evidence), given the robot's noisy distances from tower. Row values horizontally sum to 1.
@@ -238,7 +238,7 @@ class robot_stats():
         self.free_neighbors = get_trans_neighbors(self.valid_cells, self.grid)
 
         # given previous cell, what is conditional probability robot moved to another cell
-        self.T = transition_matrix(self.free_neighbors)
+        self.T = transition_matrix(self.free_neighbors, self.valid_cells)
 
         # distance from every free cell to tower with random noise element
         self.dist_tower_range = dist_to_tower_range(self.valid_cells, self.towers)
@@ -247,10 +247,12 @@ class robot_stats():
         self.obs_likely_cells = find_obs_likely_cells(self.noisy_distance, self.dist_tower_range, self.valid_cells)
 
         # get emission matrix for each observation
-        emis_matrix_list, emis_matrix_index_list = emission_matrices(self.obs_likely_cells, self.free_neighbors)
+        emis_matrix_list, emis_matrix_index_list = emission_matrices(self.obs_likely_cells, self.free_neighbors, self.valid_cells)
 
         #Flatten the observation emission matrixes into a list of dicts
         self.E_list = flatten_emis(emis_matrix_list, emis_matrix_index_list)
 
-def main():
-	robot_stats = robot_stats()
+robot = robot_stats()
+
+
+
