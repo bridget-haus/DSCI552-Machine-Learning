@@ -180,18 +180,28 @@ def find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells):
 def emission_matrices(obs_likely_cells, free_neighbors):
     '''Creates a list of emission matrixes, for each observation.
     Within each emission matrix, Rows represent each likely cell
-    Rows - likely cells (i.e. evidence), given the robot's noisy distances from tower. Row values horizontally sum to 1.
+    Rows - likely cells (i.e. evidence), given the robot's noisy distances from tower. Row values sum to 1.
     Columns - current valid cells, ascending from 1-87.
     '''
     #Store each observation's emission matrix in a list
     emis_matrix_list = []
+    emis_matrix_index_list = []
+    
     #Generate emission matrix for each observation
     for obs_index in obs_likely_cells.keys():
         obs = obs_likely_cells.get(obs_index)
         emis_matrix = np.zeros((len(obs), len(valid_cells)))
         
+        #Create an index for each emis_matrix
+        emis_matrix_index = []
+        for valid_cell in valid_cells.keys():
+            for likely_cell in obs.keys():
+                emis_matrix_index.append(f'{valid_cell}|{likely_cell}')
+        emis_matrix_index_list.append(emis_matrix_index)
+        
         #For each observation's likely cell
         for i, likely_cell in enumerate(obs.keys()):
+            
             #look up likely cell's neighbors
             neighbors = free_neighbors.get(likely_cell)
 
@@ -202,7 +212,7 @@ def emission_matrices(obs_likely_cells, free_neighbors):
             for neighbor in neighbors.keys():
                 emis_matrix[i][neighbor-1] = prob
         emis_matrix_list.append(emis_matrix)
-    return emis_matrix_list
+    return emis_matrix_list, emis_matrix_index_list
 
 # read txt file into data structures
 grid, towers, noisy_distance = get_data('hmm-data.txt')
@@ -223,4 +233,4 @@ dist_tower_range = dist_to_tower_range(valid_cells, towers)
 obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells)
 
 # get emission matrix for each observation
-emis_matrix_list = emission_matrices(obs_likely_cells, free_neighbors)
+emis_matrix_list, emis_matrix_index_list = emission_matrices(obs_likely_cells, free_neighbors)
