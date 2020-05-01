@@ -53,9 +53,8 @@ def initial_probability(grid):
     # there are 87 valid cells to start. robot has uniform probability of starting in each of them
     #Make a matrix with initial probability for each valid cell
     init_prob = round((1/len(valid_cells)), 5)
-    I = {}
-    for key in valid_cells.keys():
-        I[key] = init_prob 
+        
+    I = np.full(len(valid_cells), init_prob)
     return valid_cells, init_prob, I
 
 def get_trans_neighbors(valid_cells, grid):
@@ -232,7 +231,7 @@ class robot_stats():
         self.grid, self.towers, self.noisy_distance = get_data('hmm-data.txt')
 
         # probability of robot's initial position in any 1 cell
-        self.valid_cells, self.init_prob, I = initial_probability(self.grid)
+        self.valid_cells, self.init_prob, self.I = initial_probability(self.grid)
 
         #Get coordinates of free neighbors for each valid cell
         self.free_neighbors = get_trans_neighbors(self.valid_cells, self.grid)
@@ -247,10 +246,10 @@ class robot_stats():
         self.obs_likely_cells = find_obs_likely_cells(self.noisy_distance, self.dist_tower_range, self.valid_cells)
 
         # get emission matrix for each observation
-        emis_matrix_list, emis_matrix_index_list = emission_matrices(self.obs_likely_cells, self.free_neighbors, self.valid_cells)
+        self.emis_matrix_list, self.emis_matrix_index_list = emission_matrices(self.obs_likely_cells, self.free_neighbors, self.valid_cells)
 
         #Flatten the observation emission matrixes into a list of dicts
-        self.E_list = flatten_emis(emis_matrix_list, emis_matrix_index_list)
+        self.E_list = flatten_emis(self.emis_matrix_list, self.emis_matrix_index_list)
 
 robot = robot_stats()
 
