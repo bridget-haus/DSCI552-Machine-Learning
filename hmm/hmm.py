@@ -93,12 +93,16 @@ def get_trans_neighbors(valid_cells, grid):
 def transition_matrix(free_neighbors):
     '''Create a constant transition matrix, which are probabilities of 
     transitioning to new state conditioned on hidden state.
-    Rows - prior valid cells, ascending from 1-87. Row values horizontally sum to 1.
+    Rows - prior valid cells, ascending from 1-87. Row values sum to 1.
     Columns - current valid cells, ascending from 1-87.
     Ex: Row one is for cell coordinates 0,1. Row two is for cell coordinates 0,1... etc.
     '''
     # initialize 87x87 matrix to represent 87 free cells
     trans_matrix = np.zeros((len(valid_cells), len(valid_cells)))
+    trans_matrix_index = []
+    for i in free_neighbors.keys():
+        for j in free_neighbors.keys():
+            trans_matrix_index.append(f'{i}|{j}')
 
     for key_out in free_neighbors.keys():
         vals_outer = free_neighbors[key_out]
@@ -109,7 +113,13 @@ def transition_matrix(free_neighbors):
         #Fill out the trans matrix, make sure rows sum to 1
         for key_in in vals_outer:
             trans_matrix[key_out -1][key_in-1] = prior_prob
-    return trans_matrix
+    
+    #Flatten the trans matrix into a dictionary
+    trans_matrix_flat = dict(enumerate(trans_matrix.flatten(), 1))
+    T = {}
+    for i, idx in enumerate(trans_matrix_index, 1):
+        T[idx] = trans_matrix_flat.get(i)
+    return T
 
 def dist_to_tower_range(valid_cells, towers):
 
@@ -204,7 +214,7 @@ valid_cells, init_prob, I = initial_probability(grid)
 free_neighbors = get_trans_neighbors(valid_cells, grid)
 
 # given previous cell, what is conditional probability robot moved to another cell
-trans_matrix = transition_matrix(free_neighbors)
+T = transition_matrix(free_neighbors)
 
 # distance from every free cell to tower with random noise element
 dist_tower_range = dist_to_tower_range(valid_cells, towers)
