@@ -226,26 +226,31 @@ def flatten_emis(emis_matrix_list, emis_matrix_index_list):
         E_list.append(E)
     return E_list
 
-# read txt file into data structures
-grid, towers, noisy_distance = get_data('hmm-data.txt')
+class robot_stats():
+    def __init__(self):
+        # read txt file into data structures
+        self.grid, self.towers, self.noisy_distance = get_data('hmm-data.txt')
 
-# probability of robot's initial position in any 1 cell
-valid_cells, init_prob, I = initial_probability(grid)
+        # probability of robot's initial position in any 1 cell
+        self.valid_cells, self.init_prob, I = initial_probability(self.grid)
 
-#Get coordinates of free neighbors for each valid cell
-free_neighbors = get_trans_neighbors(valid_cells, grid)
+        #Get coordinates of free neighbors for each valid cell
+        self.free_neighbors = get_trans_neighbors(self.valid_cells, self.grid)
 
-# given previous cell, what is conditional probability robot moved to another cell
-T = transition_matrix(free_neighbors)
+        # given previous cell, what is conditional probability robot moved to another cell
+        self.T = transition_matrix(self.free_neighbors)
 
-# distance from every free cell to tower with random noise element
-dist_tower_range = dist_to_tower_range(valid_cells, towers)
+        # distance from every free cell to tower with random noise element
+        self.dist_tower_range = dist_to_tower_range(self.valid_cells, self.towers)
 
-# given noisy distance, which cells are most probable during each 11 time-steps
-obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells)
+        # given noisy distance, which cells are most probable during each 11 time-steps
+        self.obs_likely_cells = find_obs_likely_cells(self.noisy_distance, self.dist_tower_range, self.valid_cells)
 
-# get emission matrix for each observation
-emis_matrix_list, emis_matrix_index_list = emission_matrices(obs_likely_cells, free_neighbors)
+        # get emission matrix for each observation
+        emis_matrix_list, emis_matrix_index_list = emission_matrices(self.obs_likely_cells, self.free_neighbors)
 
-#Flatten the observation emission matrixes into a list of dicts
-E_list = flatten_emis(emis_matrix_list, emis_matrix_index_list)
+        #Flatten the observation emission matrixes into a list of dicts
+        self.E_list = flatten_emis(emis_matrix_list, emis_matrix_index_list)
+
+def main():
+	robot_stats = robot_stats()
