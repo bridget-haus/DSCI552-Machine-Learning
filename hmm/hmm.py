@@ -180,7 +180,7 @@ def find_obs_likely_cells(noisy_distance, dist_tower_range, valid_cells):
 def emission_matrices(obs_likely_cells, free_neighbors):
     '''Creates a list of emission matrixes, for each observation.
     Within each emission matrix, Rows represent each likely cell
-    Rows - likely cells (i.e. evidence), given the robot's noisy distances from tower. Row values sum to 1.
+    Rows - likely cells (i.e. evidence), given the robot's noisy distances from tower. Row values horizontally sum to 1.
     Columns - current valid cells, ascending from 1-87.
     '''
     #Store each observation's emission matrix in a list
@@ -193,10 +193,11 @@ def emission_matrices(obs_likely_cells, free_neighbors):
         emis_matrix = np.zeros((len(obs), len(valid_cells)))
         
         #Create an index for each emis_matrix
-        emis_matrix_index = []
-        for valid_cell in valid_cells.keys():
-            for likely_cell in obs.keys():
-                emis_matrix_index.append(f'{valid_cell}|{likely_cell}')
+        emis_matrix_index = []        
+        for likely_cell in obs.keys():
+            for valid_cell in valid_cells.keys():
+                emis_matrix_index.append(f'{likely_cell}|{valid_cell}')
+                
         emis_matrix_index_list.append(emis_matrix_index)
         
         #For each observation's likely cell
@@ -213,6 +214,17 @@ def emission_matrices(obs_likely_cells, free_neighbors):
                 emis_matrix[i][neighbor-1] = prob
         emis_matrix_list.append(emis_matrix)
     return emis_matrix_list, emis_matrix_index_list
+
+def flatten_emis(emis_matrix_list, emis_matrix_index_list):
+    '''Flatten the observation emission matrixes into a list of dicts.'''
+    E_list = []
+    for emis_m, emis_i in zip(emis_matrix_list, emis_matrix_index_list):
+        emis_m_flat = dict(enumerate(emis_m.flatten(), 1))
+        E = {}
+        for i, idx in enumerate(emis_i, 1):
+            E[idx] = emis_m_flat.get(i)
+        E_list.append(E)
+    return E_list
 
 # read txt file into data structures
 grid, towers, noisy_distance = get_data('hmm-data.txt')
@@ -234,3 +246,6 @@ obs_likely_cells = find_obs_likely_cells(noisy_distance, dist_tower_range, valid
 
 # get emission matrix for each observation
 emis_matrix_list, emis_matrix_index_list = emission_matrices(obs_likely_cells, free_neighbors)
+
+#Flatten the observation emission matrixes into a list of dicts
+E_list = flatten_emis(emis_matrix_list, emis_matrix_index_list)
