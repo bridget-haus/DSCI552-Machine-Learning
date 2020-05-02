@@ -192,7 +192,7 @@ def viterbi(noisy_distance, states, emission_matrix, transition_probability):
     
     
 def main():
-    filename = 'C:\\Users\\Peter\\Desktop\\Classes\\INF 552\\Homework 7\\hmm-data.txt'
+    filename = 'hmm-data.txt'
     grid, towers, noisy_distance = get_data(filename) 
     states = get_states_array(grid)
     emissions_matrix = get_emission_probability(states, towers, noisy_distance)
