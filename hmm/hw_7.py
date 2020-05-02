@@ -1,4 +1,4 @@
-import math  # peters distance function
+import math 
 import numpy as np
 from scipy.spatial import distance
 import pandas as pd
