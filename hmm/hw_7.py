@@ -151,14 +151,14 @@ def viterbi(noisy_distance, states, emission_matrix, transition_probability):
 
     for observation_index in range(observation_steps): # [1, 11]
         if observation_index > 0:
-            for current_state_index in range(state_steps): # [0, 87]
+            for current_state_i in range(state_steps): # [0, 87]
                 maximum_probability = 0
-                for previous_state_index in range(len(states)): # [0, 87]
-                    state_to_state_probability = viterbi_matrix[observation_index - 1][previous_state_index] * transition_probability[str(states[current_state_index]) + str(states[previous_state_index])] * emission_matrix[observation_index - 1][previous_state_index] 
+                for prev_state_i in range(len(states)): # [0, 87]
+                    state_to_state_probability = viterbi_matrix[observation_index - 1][prev_state_i] * transition_probability[str(states[current_state_i]) + str(states[prev_state_i])] * emission_matrix[observation_index - 1][prev_state_i] 
                     if state_to_state_probability > maximum_probability:
                         maximum_probability = state_to_state_probability
-                        viterbi_matrix[observation_index][current_state_index] = maximum_probability
-                        viterbi_matrix_previous[observation_index][current_state_index] = previous_state_index
+                        viterbi_matrix[observation_index][current_state_i] = maximum_probability
+                        viterbi_matrix_previous[observation_index][current_state_i] = prev_state_i
 
     cols = []
     for state in states:
@@ -170,29 +170,29 @@ def viterbi(noisy_distance, states, emission_matrix, transition_probability):
     # for row in viterbi_matrix:
     #         print(np.array(row))
 
-    temporary_maximum_probability = -1.0
-    maximum_state = ()
-    final_optimal_path_of_robot = []
-    previous_state_index = 0
+    temp_prob = 0
+    final_path = []
+    i = 0
+    for probability in viterbi_matrix[len(viterbi_matrix)-1]: # work backwords to determine the position of the robot at each observation
+        # print(probability)
+        if probability > temp_prob:
+            temp_prob = probability
+            maximum_state = states[i]
+            prev_state = i
+            # print(prev_state)
+        i+=1
+    final_path.append(maximum_state)
 
-    for state_index,probability_value in enumerate(viterbi_matrix[-1]):
-        if probability_value > temporary_maximum_probability:
-            temporary_maximum_probability = probability_value
-            maximum_state = states[state_index]
-            previous_state_index = state_index
-
-    final_optimal_path_of_robot.append(maximum_state)
-
-    for t in range(len(viterbi_matrix) - 1, 0, -1):
-        previous_state_index = viterbi_matrix_previous[t][previous_state_index]
-        final_optimal_path_of_robot.insert(0,states[previous_state_index])
+    for j in range(len(viterbi_matrix) - 1, 0, -1):
+        prev_state = viterbi_matrix_previous[j][prev_state]
+        final_path.insert(0,states[prev_state])
 
     print ("Most likely states at each oberservation:")
-    print(final_optimal_path_of_robot)
+    print(final_path)
     
     
 def main():
-    filename = 'hmm-data.txt'
+    filename = 'C:\\Users\\Peter\\Desktop\\Classes\\INF 552\\Homework 7\\hmm-data.txt'
     grid, towers, noisy_distance = get_data(filename) 
     states = get_states_array(grid)
     emissions_matrix = get_emission_probability(states, towers, noisy_distance)
