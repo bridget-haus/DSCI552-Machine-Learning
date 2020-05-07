@@ -7,6 +7,8 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
+
 
 
 def main():
@@ -34,8 +36,11 @@ def split_train_test(filename):
 
 	# randomly split train and test data
 	data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.33, random_state=3)
+	sc = StandardScaler()
+	data_train_s = sc.fit_transform(data_train)
+	data_test_s = sc.fit_transform(data_test)
 
-	return class_names, feature_names, data_train, data_test, labels_train, labels_test
+	return class_names, feature_names, data_train_s, data_test_s, labels_train, labels_test
 
 
 def decision_tree(class_names, feature_names, data_train, labels_train):

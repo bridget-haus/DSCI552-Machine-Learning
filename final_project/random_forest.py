@@ -4,6 +4,8 @@ from sklearn.metrics import accuracy_score
 
 class_names, feature_names, data_train, data_test, labels_train, labels_test = scikit_tree.split_train_test('data.csv')
 
+#Random state tests
+
 #N_estimators tests
 n_est_list = [1, 10, 100, 500]
 for n_est in n_est_list:
