@@ -33,7 +33,7 @@ def split_train_test(filename):
 			labels.append(row[1])
 
 	# randomly split train and test data
-	data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.33)
+	data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.33, random_state=3)
 
 	return class_names, feature_names, data_train, data_test, labels_train, labels_test
 
@@ -41,7 +41,7 @@ def split_train_test(filename):
 def decision_tree(class_names, feature_names, data_train, labels_train):
 
 	# fit data
-	clf = tree.DecisionTreeClassifier()
+	clf = tree.DecisionTreeClassifier(criterion="entropy", random_state=1)
 	clf = clf.fit(data_train, labels_train)
 	# create tree visualization
 	tree.export_graphviz(clf, out_file="tree.dot", filled=True, feature_names=feature_names, class_names=class_names)
