@@ -8,6 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
+import time
 
 
 
@@ -47,7 +48,13 @@ def decision_tree(class_names, feature_names, data_train, labels_train):
 
 	# fit data
 	clf = tree.DecisionTreeClassifier(criterion="entropy", random_state=1)
+
+	start = time.time()
 	clf = clf.fit(data_train, labels_train)
+	end = time.time()
+	t_time = round(((end - start) * 1000), 4)
+	print(f'Training time: {t_time} ms')
+
 	# create tree visualization
 	tree.export_graphviz(clf, out_file="tree.dot", filled=True, feature_names=feature_names, class_names=class_names)
 	# convert .dot file to .png
@@ -56,10 +63,15 @@ def decision_tree(class_names, feature_names, data_train, labels_train):
 
 def predict(clf, data_test, labels_test):
 
-	# get predictions for test
+	# get predictions and time for test
+	start = time.time()
 	label_pred = clf.predict(data_test)
+	end = time.time()
+	test_time = round(((end - start) * 1000), 4)
+	print(f'Testing Time: {test_time} ms')
 
-	print(f'Accuracy of model is: {accuracy_score(labels_test, label_pred)}')
+	acc = accuracy_score(labels_test, label_pred)
+	print(f'Accuracy: {acc}')
 
 	# generate confision matrix
 	cm = confusion_matrix(labels_test, label_pred)

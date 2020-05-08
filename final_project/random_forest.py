@@ -11,43 +11,44 @@ GLO = time.time()
 #N_estimators tests
 def n_est_tests(n_est_list):
 	for n_est in n_est_list:
-		start_time = time.time()
 		model = RandomForestClassifier(criterion="entropy", n_estimators=n_est, random_state=0)
+		start_time = time.time()
 		model.fit(data_train, labels_train)
 		end_time = time.time()
 		t_time = round(((end_time - start_time) * 1000), 4)
 		label_pred = model.predict(data_test)
 		acc_score = round((accuracy_score(labels_test, label_pred)), 4)
-		print(f'Number trees: {n_est};  Time: {t_time} ms; Accuracy: {acc_score}')
+		print(f'Number trees: {n_est};  Training Time: {t_time} ms; Accuracy: {acc_score}')
 
 #Max_depth tests
 def max_depth_tests(max_depth_list):
 	
 	for depth in max_depth_list:
-		start_time = time.time()
 		model = RandomForestClassifier(criterion="entropy", n_estimators=100, random_state=0, max_depth=depth)
+		start_time = time.time()
 		model.fit(data_train, labels_train)
 		end_time = time.time()
 		t_time = round(((end_time - start_time) * 1000), 4)
 		label_pred = model.predict(data_test)
 		acc_score = round((accuracy_score(labels_test, label_pred)), 4)
-		print(f'Max depth: {depth}; Time: {t_time} ms; Accuracy: {acc_score}')
+		print(f'Max depth: {depth}; Training Time: {t_time} ms; Accuracy: {acc_score}')
 
 #Max bag samples tests
 def max_sample_tests(data_percents):
 	data_len = len(data_train)
 	
 	for perc in data_percents:
-		start_time = time.time()
+		
 		max_sample = int(round(perc*data_len))
 		model = RandomForestClassifier(criterion="entropy", n_estimators=100, random_state=0, 
 		                               max_depth=5, max_samples=max_sample)
+		start_time = time.time()
 		model.fit(data_train, labels_train)
 		end_time = time.time()
 		t_time = round(((end_time - start_time) * 1000), 4)
 		label_pred = model.predict(data_test)
 		acc_score = round((accuracy_score(labels_test, label_pred)), 4)
-		print(f'Max bag sample length: {max_sample};  Time: {t_time} ms; Accuracy: {acc_score}')
+		print(f'Max bag sample length: {max_sample};  Training Time: {t_time} ms; Accuracy: {acc_score}')
 
 def sum_of_n_numbers(n):
 	# start_time = time.time()

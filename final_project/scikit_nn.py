@@ -2,6 +2,7 @@ import scikit_tree
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report,confusion_matrix
+import time
 
 def scikit_nn():
   class_names, feature_names, data_train, data_test, labels_train, labels_test = scikit_tree.split_train_test('data.csv')
@@ -17,10 +18,18 @@ def scikit_nn():
                      verbose = False)
 
   #Fit the model with X_train and Y_train
+  start = time.time()
   mlp.fit(data_train,labels_train)
+  end = time.time()
+  train_time = round(((end - start) * 1000), 4)
+  print(f'Training time: {train_time} ms')
 
   #Use model to get predictions on test images
+  start = time.time()
   predictions = mlp.predict(data_test)
+  end = time.time()
+  test_time = round(((end - start) * 1000), 4)
+  print(f'Testing time: {test_time} ms')
 
   #Get prediction stats
   print(classification_report(labels_test,predictions))
