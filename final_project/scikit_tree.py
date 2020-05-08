@@ -36,7 +36,7 @@ def split_train_test(filename):
 			labels.append(row[1])
 
 	# randomly split train and test data
-	data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.33, random_state=3)
+	data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.33, random_state=5)
 	sc = StandardScaler()
 	data_train_s = sc.fit_transform(data_train)
 	data_test_s = sc.fit_transform(data_test)
@@ -47,7 +47,7 @@ def split_train_test(filename):
 def decision_tree(class_names, feature_names, data_train, labels_train):
 
 	# fit data
-	clf = tree.DecisionTreeClassifier(criterion="entropy", random_state=1)
+	clf = tree.DecisionTreeClassifier(criterion="entropy", random_state=5)
 
 	start = time.time()
 	clf = clf.fit(data_train, labels_train)

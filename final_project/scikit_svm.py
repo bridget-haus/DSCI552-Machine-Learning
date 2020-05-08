@@ -15,11 +15,8 @@ def svm():
 	print(f'Training time: {train_time} ms')
 
 	#Test
-	# start = time.time()
 	scikit_tree.predict(clf, data_test, labels_test)
-	# end = time.time()
-	# test_time = round(((end - start) * 1000), 4)
-	# print(f'Testing time: {test_time} ms')
+
 
 if __name__ == '__main__':
 	svm()
